@@ -1,0 +1,101 @@
+function Send-TelegramMessage {
+<#
+.SYNOPSIS
+    Sends message to Telegram chat bot.
+
+.DESCRIPTION
+    Uses Telgram bots API to create sendMessage request.
+
+.PARAMETER token
+    Each bot is given a unique authentication token wen it is created. The token looks something like 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11. You can learn about obtaining tokens and generating new ones at https://core.telegram.org/bots#botfather.
+
+.PARAMETER ChatID
+    Unique identifier for the target chat or username of the target channel.
+
+.PARAMETER Message
+    Unique identifier for the target chat or username of the target channel.
+
+.PARAMETER UseMarkdown
+    Send Markdown, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message. Use the following syntax in your message:
+    *bold text*
+    _italic text_
+    [inline URL](http://www.example.com/)
+    [inline mention of a user](tg://user?id=123456789)
+    `inline fixed-width code`
+    ```block_language
+    pre-formatted fixed-width code block
+    ```
+
+.PARAMETER NoPreview
+    Disables link previews for links in this message
+
+.PARAMETER Quiet
+    Sends the message silently. Users will receive a notification with no sound. Works only for channels
+
+.INPUTS
+    None
+
+.NOTES
+    Version:        1.0
+    Author:         Dilanyan Maxim
+    Creation Date:  15.09.2018
+    Purpose/Change: Initial script development
+
+.LINK
+Telegram: https://telegram.org
+Telegram API: https://core.telegram.org/bots/api
+Telegram BotFather: https://core.telegram.org/bots#botfather
+    
+
+.EXAMPLE
+    Send-TelegramMessage -Token '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11' -Message 'www.youtube.com'
+  
+    Send message with youtube link. Preview will be generated automatically.
+
+.EXAMPLE
+    Get-ADUser -Filter {Enabled -eq $true} | ForEach-Object {Send-TelegramMessage -Message "$($_.Name)"} | Out-Null
+  
+    Gets AD Users and sends each name in separate message. | Out-Null hides the output
+#>
+
+[CmdletBinding()]
+   param(
+   [Parameter(Mandatory=$true)]
+   [string]$Token = '',
+
+   [Parameter(Mandatory=$true)]
+   [string]$ChatID,
+
+   [Parameter(Mandatory=$true)]
+   [string]$Message,
+
+   [Parameter(Mandatory=$false)]
+   [switch]$UseMarkdown,
+
+   [Parameter(Mandatory=$false)]
+   [switch]$NoPreview,
+
+   [Parameter(Mandatory=$false)]
+   [switch]$Quiet
+   )
+
+   Begin {
+    if($NoPreview) { $preview_mode = "True" }
+    if($UseMarkdown) { $Markdown_mode = "Markdown" } else {$Markdown_mode = ""}
+    if($Quiet) {$disable_notification = "True"} else {$disable_notification = ""}
+   }
+
+   Process {
+    $payload = @{
+        "chat_id" = $ChatID;
+        "text" = $Message
+        "parse_mode" = $Markdown_mode;
+        "disable_web_page_preview" = $preview_mode;
+        "disable_notification" = $disable_notification;
+    }
+        
+    Invoke-WebRequest -Uri ("https://api.telegram.org/bot{0}/sendMessage" -f $token) -Method Post -ContentType "application/json;charset=utf-8" -Body (ConvertTo-Json -Compress -InputObject $payload)
+   }
+
+   End {}
+}
