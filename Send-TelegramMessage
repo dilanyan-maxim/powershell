@@ -10,7 +10,7 @@ function Send-TelegramMessage {
     Each bot is given a unique authentication token wen it is created. The token looks something like 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11. You can learn about obtaining tokens and generating new ones at https://core.telegram.org/bots#botfather.
 
 .PARAMETER ChatID
-    Unique identifier for the target chat or username of the target channel.
+    Unique identifier for the target chat or username of the target channel. You can find chatid by starting chat with the bot and then following the link https://api.telegram.org/bot<token>/getUpdates
 
 .PARAMETER Message
     Unique identifier for the target chat or username of the target channel.
